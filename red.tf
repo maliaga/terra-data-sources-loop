@@ -9,11 +9,12 @@ resource "aws_vpc" "main1" {
   }
 }
 
-resource "aws_subnet" "subnet1" {
-  cidr_block = var.subnet1_cidr
-  vpc_id     = aws_vpc.main1.id
-
-  tags = {
-    Name = "Subnet 1"
+resource "aws_subnet" "subnets" {
+  vpc_id            = aws_vpc.main1.id
+  count             = length(data.aws_availability_zones.d_zone.names)
+  cidr_block        = element(var.subnet1_cidr, count.index)
+  availability_zone = element(data.aws_availability_zones.d_zone.names, count.index)
+  tags              = {
+    Name = "Subnet ${count.index + 1} on ${element(data.aws_availability_zones.d_zone.names, count.index )}"
   }
 }
